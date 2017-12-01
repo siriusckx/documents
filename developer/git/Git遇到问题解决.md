@@ -9,3 +9,12 @@
 * `git config --global core.safecrlf true`
 ## remote: Permission to ***/***.git denied to *** 问题解决（Windows）
 * `控制面板`→`用户账户`→`凭证管理器`→将对应的凭证删除，然后再重新`git push`输入新的用户名和密码即可
+## error setting certificate verify locations CAfile:false; CApath:none;
+* 解决办法1：修改成正确的路径
+```
+git config --system http.sslcainfo "C:\Program Files (x86)\git\bin\curl-ca-bundle.crt"
+```
+* 解决办法2：去掉这个验证
+```
+git config --system http.sslverify false
+```

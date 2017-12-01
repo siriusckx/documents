@@ -1,7 +1,7 @@
 # Git配置
 ## Windows使用Git慢的问题，在bash中添加
 * `git config --global core.preloadindex true`
-* git config --global core.fscache true``
+* `git config --global core.fscache true`
 ## 记住登录用户和密码
 * `git config --global credential.helper store`
 ## 禁止自动转换windows和linux的回车换行

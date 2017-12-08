@@ -35,4 +35,19 @@
 
 1. 如果是在Eclipse当中，则在提交的时候，会对应到untaged changes，这个时候可以将其选中，拖动到taged changes一栏当中，提交push即可。
 
+## Git恢复被修改的文件
+>1.恢复到最后一次提交的改动  
+`git checkout -- + 需要恢复的文件名`  
 
+>2.但是，需要注意的是，如果该文件已经 add 到暂存队列中，上面的命令就不灵光喽
+需要先让这个文件取消暂存，然后再使用第一条指令取消文件
+`git reset HEAD -- + 需要取消暂存的文件名`  
+
+>3.【额外】如果感觉命令多了记不住，那就做一两个匿名呗，比如:  
+` git config --global alias.unstage 'reset HEAD --'`  
+`git config --global alias.restore 'checkout --'`  
+我们拿 README.md 这个文件举例，比如修改了一段文字描述，想恢复回原来的样子：  
+` git restore README.md`  
+即可，如果修改已经被 git add README.md 放入暂存队列，那就要  
+`git unstage README.md`  
+`git restore README.md`  

@@ -1,4 +1,4 @@
-# 编译安装VIM8.0
+# 一、编译安装VIM8.0
 [编译安装vim8.0 参考地址](http://blog.csdn.net/a464057216/article/details/52821171)
  * 安装依赖库
  * 删除原有vim
@@ -42,11 +42,11 @@ sudo update-alternatives --install /usr/bin/vi vi /usr/bin/vim 1
 sudo update-alternatives --set vi /usr/bin/vim
 ```
 >最后，删除vim源码包，执行vim --version命令查看vim的版本号、补丁号以及是否成功开启了Python的支持（包含+python）。
-# 配置VIM插件
+# 二、配置VIM插件
 >对于vim插件的配置[vim-bootstrap](http://vim-bootstrap.com/)提供了一些现成的模板，只需要选中自己想要支持的语言，即可生成对应的generate.vim文件，将其改名为.vimrc放到家目录下，安装好插件即可使用。当然要想安装提供的模板之外的插件，接下来对vim插件的管理方式进行一些了解，并自行安装另外的插件markdown。
-# 了解VIM插件管理
+# 三、了解VIM插件管理
 
-# 安装MARKDOWN
+# 四、安装MARKDOWN
 
 ## VIM的使用
 1. 假死状态解决

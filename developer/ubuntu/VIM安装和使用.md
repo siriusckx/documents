@@ -45,9 +45,18 @@ sudo update-alternatives --set vi /usr/bin/vim
 # 二、配置VIM插件
 >对于vim插件的配置[vim-bootstrap](http://vim-bootstrap.com/)提供了一些现成的模板，只需要选中自己想要支持的语言，即可生成对应的generate.vim文件，将其改名为.vimrc放到家目录下，安装好插件即可使用。当然要想安装提供的模板之外的插件，接下来对vim插件的管理方式进行一些了解，并自行安装另外的插件markdown。
 # 三、了解VIM插件管理
-
+[插件管理参考地址](https://segmentfault.com/a/1190000010063958)
+**主流的插件管理器有**[pathogen](https://github.com/tpope/vim-pathogen)、[Vundle](https://github.com/VundleVim/Vundle.vim)、[vim-plug](https://github.com/junegunn/vim-plug)、[dein.vim](https://github.com/Shougo/dein.vim)，在这几个插件当中，比较主要用过的有`Vundle`、`vim-plug`这两个插件管理方式比较文件使用，本文里面提到的`vim-bootstrap`使用的是`vim-plug`的管理方式。具体如何使用，可参照官方文档进行查看即可。
 # 四、安装MARKDOWN
-
+以`vim-plug`安装插件为例，安装markdown，在使用`vim-bootstrap`的基础上要添加其他的插件，一般情况下可采用如下三个步骤进行：
+1. 在github上找到对应的插件目录，如：https://github.com/plasticboy/vim-markdown 则在`.vimrc`文件中添加`Plug 'plasticboy/vim-markdown'`
+1. 接下来配置插件使用的一些快捷键或相应的配置，如：
+```
+" MarkdownPreview GitHub
+map <leader>m :MarkdownPreview GitHub<CR> 
+"在这里<leader>由"let mapleader=" "决定
+```
+1. 保存`.vimrc`文件并关闭，然后重新打开，自行安装插件。
 ## VIM的使用
 1. 假死状态解决
 > 使用vim时，如果你不小心按了 Ctrl + s后，你会发现不能输入任何东西了，像死掉了一般，其实vim并没有死掉，这时vim只是停止向终端输出而已，要想退出这种状态，只需按Ctrl + q 即可恢复正常。

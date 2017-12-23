@@ -70,3 +70,8 @@ ALTER USER 'chengkx'@'localhost' PASSWORD EXPIRE DEFAULT;
 -- 注意在修改用户密码的时候，对于5.7.6之前的版本要使用SET PASSWORD语句进行修改，而不能使用ALTER USER语句进行修改。
 
 ```
+## 五、用户认证插件
+## 六、代理用户管理
+## 七、用户锁定
+## 八、用户激活
+## 九、总结

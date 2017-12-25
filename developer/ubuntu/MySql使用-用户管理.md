@@ -1,11 +1,11 @@
 ## 一、连接MySQL
-`mysql`> `mysql -u username -ppassword db_name;`
+`mysql`> `mysql -u username -ppassword db_name;`  
 `mysql`:`mysql -u root -p123456 pets;`
 
 ## 二、创建用户
 > 创建用户，只能访问`localhost`,给用户赋增加、删除、修改、查询权限
 
-`mysql`> `CREATE USER 'chengkx'@'localhost' IDENTIFIED BY '123456';`
+`mysql`> `CREATE USER 'chengkx'@'localhost' IDENTIFIED BY '123456';`  
 `mysql`> `GRANT SELECT,INSERT,UPDATE,DELETE,ON pets.* TO 'chengkx'@'localhost';`
 
 > 为用户授权，能够创建、删除表
@@ -14,7 +14,7 @@
 
 > 查看用户权限、查看创建用户语句
 
-`mysql`>`SHOW GRANTS FOR 'chengkx'@'localhost';`
+`mysql`>`SHOW GRANTS FOR 'chengkx'@'localhost';`  
 `mysql`>`SHOW CREATE USER 'chengkx'@'localhost';`
 
 > 删除账号

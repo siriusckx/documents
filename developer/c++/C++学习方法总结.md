@@ -1,5 +1,19 @@
 ## 学习方法总结
 1. 掌握基础语法是第一步，硬着头皮多写一些代码；
-> 菜鸟教程是一个不错的选择 http://www.runoob.com/cplusplus/cpp-tutorial.html
+   > 菜鸟教程是一个不错的选择 http://www.runoob.com/cplusplus/cpp-tutorial.html
 1. 逛相应主题的论坛，回答问题
-> csdn论坛是一个不错的选择 http://bbs.csdn.net/forums/Cpp
+   > csdn论坛是一个不错的选择 http://bbs.csdn.net/forums/Cpp
+
+## 项目驱动的实际
+1. 项目环境的部署
+1. 项目部署好，调试运行
+1. 项目的整体结构
+   * 项目入口
+   * 项目配置文件
+1. 项目代码层面
+   * 看项目整体结构
+   * 看项目详细功能代码
+   * 查缺补漏相关技术知识
+   * 查缺补漏相关业务知识
+1. 了解项目相关干系人，方便问题的咨询
+1. 重复调试、运行掌握相关工具常用快捷键和设置，掌握相关技术业务知识

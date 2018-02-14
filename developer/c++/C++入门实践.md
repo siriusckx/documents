@@ -91,4 +91,4 @@
 1. 如何运用C++11的特性，并知道哪一个G++版本支持哪些特性
    * 可参考[C++ Standards Support in GCC](https://gcc.gnu.org/projects/cxx-status.html#cxx11)，[GCC,the GNU Compiler Collection](https://gcc.gnu.org/)
    * 对于一些标准网站的专业词汇看不懂的，可以查看`C++ Primer 2015版`对应后面的索引，有对应的功能索引和翻译。
-1. 其他技巧
+1. 其他技巧，待续……

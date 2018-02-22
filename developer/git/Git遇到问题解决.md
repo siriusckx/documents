@@ -57,3 +57,15 @@
 >2. `git add .` 表示添加当前目录下和子目录下所有的文件，包括当前目录下以.开头的文件;
 >3. `git add *` 其实并不是git的命令，它只是被shell解释为通配符，表示添加当前目录下和子目录西所有的文件，除了当前目录下以.开头的文件，如.gitignore就不会添加。但是子目录下以.开头的文件会添加。
 >4. `git commit -am "注释内容"` 可以省去`git add -A`这一步骤。
+
+## 七、如何更新已fork的项目
+1. clone 自己的fork分支到本地
+1. 增加源分支地址到你项目远程分支列表中(此处是关键)，先得将原来的仓库指定为upstream，命令为：
+   *  git remote add upstream https://github.com/被fork的仓库.git
+   *  此处使用git remote -v 查看远程分支列表
+1. fetch源分支的新版本到本地
+   * git fetch upstream
+1. 合并两个版本的代码
+   * git merge upstream/master
+1. 将合并后的代码push到github上去
+   * git push origin master

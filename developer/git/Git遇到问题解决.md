@@ -69,3 +69,8 @@
    * git merge upstream/master
 1. 将合并后的代码push到github上去
    * git push origin master
+
+## 八、如何将github上的分支拉到本地并创建本地分支
+```
+git checkout -b br-2.1.1.1  origin/br-2.1.2.1
+```

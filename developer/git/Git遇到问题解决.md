@@ -74,3 +74,7 @@
 ```
 git checkout -b br-2.1.1.1  origin/br-2.1.2.1
 ```
+## 九、Git克隆的时候指定用户名
+```
+git clone http://username@github.com/projectname.git
+```

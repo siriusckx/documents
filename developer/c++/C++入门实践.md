@@ -24,7 +24,7 @@
          * Configuration Type:`Application (.exe)`
       * Debugging
          * Command:`$(TargetPath)`
-         * Command Arguments:`$(SolutionDir)_runtime\conf\project\projectname.ini`
+         * Command Arguments:`$(SolutionDir)_runtime\conf\$(ProjectName)\$(ProjectName).ini`
          * Working Directory:`$(SolutionDir)_runtime\$(PlatformName).$(ConfigurationName)`
       * C/C++
          * General

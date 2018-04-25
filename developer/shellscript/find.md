@@ -11,3 +11,11 @@ find . -type f |xargs sed -i 's/^M/\n/g'
 ```
 find . -type f |xargs sed -i 's/\xef\xbb\xbf//g'
 ```
+> 列出当前目录下的所有文件(包括隐藏文件)的绝对路径,对目录不做递归
+```
+find $PWD -maxdepth 1 | xargs ls -ld  
+```
+> 列出当前目录下的所有文件（包括隐藏文件）的绝对路径，对目录做递归
+```
+find $PWD | xargs ls -ld
+```

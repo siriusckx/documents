@@ -4,7 +4,7 @@ jar xvf lm.jar
 ```
 ## 打包的时候引入MANIFEST(SpringBoot打包适用)
 ```
-jar cvfm0 test-1.0.0-RELEASE.ja ./META-INF/MANIFEST.MF .
+jar cvfm0 test-1.0.0-RELEASE.jar ./META-INF/MANIFEST.MF .
 
 参数含义：
 c:创建一个jar包

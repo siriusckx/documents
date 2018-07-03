@@ -19,3 +19,10 @@ find $PWD -maxdepth 1 | xargs ls -ld
 ```
 find $PWD | xargs ls -ld
 ```
+> 删除乱码文件
+```
+查询inode节点
+ll -i 
+找到inode节点，进行删除
+find . -inum 3501052912 -exec rm {} \;
+```

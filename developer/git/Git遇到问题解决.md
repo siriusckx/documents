@@ -78,3 +78,9 @@ git checkout -b br-2.1.1.1  origin/br-2.1.2.1
 ```
 git clone http://username@github.com/projectname.git
 ```
+## 十、提交本地分支作为远程的分支
+```
+git push origin test:master         // 提交本地test分支作为远程的master分支
+git push origin test:test           // 提交本地test分支作为远程的test分支
+git push origin :test               // 刚提交到远程的test将被删除，但是本地还会保存的
+```

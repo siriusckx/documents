@@ -1,0 +1,1 @@
+[Android程序入口以及项目文件夹的含义和使用总结—入门](https://www.cnblogs.com/mingjiatang/p/5978538.html)

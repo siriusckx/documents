@@ -57,4 +57,15 @@ KiB Swap：是虚拟内存使用，全部、已使用、空闲和缓冲交换空
 
 > top是一个交互式的命令，按h进行帮助，其他的可以根据情况进行查文档，勤加练习 。 
 
+### 在top下一些命令的使用
+**M**:按照内存一列进行排序，R可以进行逆序。  
+**P**:按照CPU一列进行排序，R可以进行逆序。  
+**E**:切换内存概要的显示单位。  
+**e**:切换任务列表上，内存的显示单位。  
+**c**:显示进程命令的全路径。
+
+### Load和CPU利用率是如何算出来的
+http://www.cnblogs.com/hero4china/p/7125110.html
+
+
 参考：[30 个实例详解 TOP 命令](https://mp.weixin.qq.com/s?__biz=MzAxODI5ODMwOA==&mid=2666541472&idx=1&sn=e55096ec7447c54aad1b534322f542b7&chksm=80dcf50bb7ab7c1d5b54f43ffde94d2d30487e6c95726568496f17e16422afad1d2c1383e6c2&mpshare=1&scene=1&srcid=1114zGcMlDNob2tc8aqIU178&pass_ticket=BFk1ncyev8KFx3EsclgjEGAtxg4D4%2BaorpsZZr5OGH8v%2B7Wboy5cSHFTcQdPe5TA#rd)

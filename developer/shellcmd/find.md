@@ -26,3 +26,8 @@ ll -i
 找到inode节点，进行删除
 find . -inum 3501052912 -exec rm {} \;
 ```
+
+> 查询并排除不需要的文件
+```
+find /glusterfs/metadatas/1802 -path "/glusterfs/metadatas/1802/SZ/*/0/20190418-20190419" -prune -o -print --exec rm -rf {} \;
+```

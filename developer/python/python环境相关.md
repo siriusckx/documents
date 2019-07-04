@@ -44,3 +44,20 @@ ERROR: No matching distribution found for pylint
    HOMEPATH=c:/user/xxxx
    path=$path;%HOMEPATH%\pip\pip.in
    ```
+## python中有中文报错
+```
+SyntaxError: Non-ASCII character '\xef' in file server.py on line 18, but no encoding declared
+```
+1. 在文件第一行添加编译设置
+   1. 方法1
+   ```
+   #coding=utf-8
+   或者
+   #encoding=utf-8
+
+   注意：等号两边不能有任何空格
+   ```
+   2. 方法2
+   ```
+   # -*- coding:utf-8 -*- 
+   ```

@@ -61,3 +61,8 @@ SyntaxError: Non-ASCII character '\xef' in file server.py on line 18, but no enc
    ```
    # -*- coding:utf-8 -*- 
    ```
+  ## python安装bson
+  ```
+  pip uninstall bson
+  pip install pymongo
+  ```

@@ -31,3 +31,14 @@ find . -inum 3501052912 -exec rm {} \;
 ```
 find /glusterfs/metadatas/1802 -path "/glusterfs/metadatas/1802/SZ/*/0/20190418-20190419" -prune -o -print --exec rm -rf {} \;
 ```
+
+>查找目录下的所有文件中是否含有某个字符串 
+```
+# 查找SO_REUSEADDR在linux文档中的定义
+find /usr/include |xargs grep -ri "SO_REUSEADDR" 
+```
+
+>查找目录下的所有文件中是否含有某个字符串,并且只打印出文件名 
+```
+find .|xargs grep -ri "IBM" -l 
+```

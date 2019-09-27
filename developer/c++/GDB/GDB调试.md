@@ -18,6 +18,24 @@ https://blog.csdn.net/meteor1113/article/details/5180293
    p *(quoter::QuoterBase*)0x8876783234
    ```
 
+   ```
+   p *((*(SegmentInfo*)0x7f88618122c0).structDatas._M_impl._M_start)@2
+   ```
+
+4. px和pn的含义
+
+   ```
+   element_type * px;                 // contained pointer
+   boost::detail::shared_count pn;    // reference counter
+   ```
+
+5. 通过GDB查看智能指针的引用情况
+   ```
+   p *(boost::detail::shared_count*)0x7f7bafb78ea0 //对应pn的地址
+
+   p *(boost::detail::sp_counted_impl_p<quoter::QuoteAux>*)0x7f7bafb78ea0  //对应pn的地址
+   ```
+
 ## GDB操作技巧
 https://www.cnblogs.com/JN-PDD/p/6953136.html
 

@@ -105,6 +105,200 @@ bjam -toolset=msvc -with-filesystem -build-type=complete stdlib=stlport stage
 
    >filesystem库还提供了一些便利的谓词函数is_xxx()，可以简化对文件状态的判断，大部分谓词函数都可以望文知意，比较特别的是is_other()和is_empty()。当文件存在且不是普通文件、目录或链接文件时is_other()返回true。如果path对象是目录，那么当目录里无文件时is_empty()返回true，如果path对象是文件，那么文件长度为0,is_empty()返回true.
 
+5. 文件属性
+   1. initial_path() 返回程序启动时（进入main函数）的当前路径
+   2. current_path()返回当前路径，它和initial_path返回的都是一个完整路径（绝对路径）;
+   3. file_size()以字节为单位返回文件的大小
+   4. last_write_time()返回文件的最后修改时间
+   5. space()可以返回一个space_info结构，表明该路径下的磁盘空间分配情况
+
+6. 文件操作
+   1. create_directory 创建目录
+   2. rename 文件改名
+   3. remove 文件删除
+   4. copy_file 文件拷贝
+
+   ```
+   #include <boost/filesystem.hpp>
+   using namespace boost::filesystem;
+   int main()
+   {
+       namespace fs = boost::filesystem;
+
+       path ptest = "c:/test";
+       if(exists(ptest))
+       {
+           if(is_empty(ptest))
+           {
+               fs::remove(ptest); //remove只能删除空目录或者文件
+           }
+           else
+           {
+               remove_all(ptest); //remove_all 可以递归删除
+           }
+       }
+
+       assert(!exists(ptest));
+       create_directory(ptest);    //创建一个目录
+
+       copy_file("d:/boost/readme.txt", ptest / "a.txt"); //拷贝
+       rename(ptest / "a.txt", ptest / "b.txt");  //改名
+
+       create_directories(ptest / "sub_dir1" / "sub_dir1"); //使用create_directories可以一次创建多级目录
+   }
+   ```
+
+7. 迭代目录
+   > filesystem库使用basic_directory_iterator提供了迭代一个目录下的所有文件的功能，它预定义了两个typedef:directory_iterator和wdirectory_iterator. directory_iterator用法有些类似string_algo库的find_iterator、split_iterator或xpressive库的regex_token_iterator，空的构造函数生成一个逾尾end迭代器，伟入path对象构造将开始一个迭代操作，反复调用operator++即可迭代目录下的所有文件。如：
+
+   ```
+   directory_iterator end;
+   for( directory_iterator pos("d:/boost/"); pos != end; ++pos)
+   {
+       cout << *pos << endl;
+   }
+   ```
+
+
+   > 需要注意：basic_directory_iterator迭代器返回的对象并不是path，而是一个basic_directory_entry对象，但basic_directory_entry类定义了一个到path的类型转换函数，因此可以在需要path的语境中隐式转换到path.
+
+   >basic_directory_entry可以用path()方法返回路径，status()返回路径的状态，它也有两个typedef，与directory_iterator对应的是directory_entry。
+
+   >directory_iterator只能迭代本层目录，不支持深度遍历目录，可以使用递归来实现这个功能，并不是很难
+
+   ```
+   void recursive_dir(const path& dir)   //递归遍历目录
+   {
+       directory_iterator end;
+       for(directory_iterator pos(dir); pos != end; ++pos)
+       {
+           if(is_directory(*pos))
+           {
+               recursive_dir(*pos); //是目录则递归遍历
+           }
+           else
+           {
+               cout << *pos << endl;
+           }
+       }
+   }
+   ```
+
+   >filesystem库专门提供了另外一个类basic_recursive_directory_iterator,它遍历目录的效率要比递归的directory_iterator高很多，它可以递归遍历目录结构。  
+
+   ```
+   typedef recursive_directory_iterator rd_iterator;
+   ```
+
+   >成员函数level()返回当前的目录深度m_level,当rd_iterator构造时(未开始遍历)m_level == 0，每深入一层子目录则m_level增加，退出时减少。成员函数pop()用于退出当前目录层次的遍历，同时--m_level。当迭代到一个目录时，no_push可以让目录不参与遍历，使rd_iterator的行为等价于directory_iterator。
+
+   > 使用rd_iterator，对目录进行深度遍历：
+
+   rd_iterator end;
+   for(rd_iterator pos("d:/test"); pos != end; ++pos)
+   {
+       cout << "level" << pos.level() << ":" << *pos << endl;
+   }
+
+   >下面代码使用no_push()令rd_iterator的行为等价于directory_iterator:
+
+   ```
+   rd_iterator end;
+   for(rd_iterator pos("d:/test"); pos != end; ++pos)
+   {
+       if(is_directory(*pos))
+       {
+           pos.no_push(); //使用no_push()，不深度遍历
+       }
+       cout << *pos << endl;
+   }
+   ```
+
+   >恰当地使用level()和no_push()，不宋史以实现指定深度的目录遍历。
+
+# 3 对应的一些实例
+
+## 3.1 实现查找文件功能
+
+```
+#include <boost/optional.hpp>
+optional<path> find_file(const path& dir, const string& filename)
+{
+    typedef optional<path> result_type;          //返回值类型定义
+    if(!exists(dir) || !is_directory(dir))
+    {
+        return result_type();
+    }
+
+    rd_iterator end;                             //递归迭代器
+    for(rd_iterator pos(dir); pos != end; ++pos)
+    {
+        if(!is_directory(*pos) && pos->path().filename() == filename)
+        {
+            return result_type(pos->path());
+        }
+    }
+
+    return result_type();
+}
+
+
+int main()
+{
+    optional<path> r= find_file("d:/atest", "README.txt");
+    if(r)
+    {
+        cout << *r << endl;
+    }
+    else
+    {
+        cout << "file not found" << endl;
+    }
+}
+
+```
+
+## 3.2 实现模糊查找文件功能
+> 模糊查找的几个实现要点：  
+> 1. 文件名中用于分隔主名与扩展名的点号必须转义，因为点号在正则表达式中是一个特殊的字符；
+> 2. 通配符*应该转换为正则表达式的\.\*,以表示任意多的字符；
+> 3. 在判断文件名是否查找到时我们应该使用正则表达式而不是简单的判断相等。
+> 4. 函数的返回值不能再使用optional\<path\>,因为模糊查找可能会返回多个结果，因此应该使用vector\<path\>。
+
+```
+#include <boost/xpressive/xpressive_dynamic.hpp>
+#include <boost/algorithm/string.hpp>
+
+using namespace boost::xpressive;
+void find_files(const path& dir, const string& filename, vector<path> &v)
+{
+    static xpressive::sregex_compiler rc;     //正则表达式工厂
+    if(!rc[filename].regex_id())
+    {
+        string str = replace_all_copy(replace_all_copy(filename, ".", "\\."), "*", ".*");       //处理文件名
+
+        rc[filename] = rc.compile(str);  //创建正则表达式
+    }
+
+    typedef vector<path> result_type;    //返回值类型定义
+    if(!exists(dir) || !is_directory(dir))
+    {
+        return;
+    }
+
+    rd_iterator end;                      //递归迭代器逾尾位置
+    for(rd_iterator pos(dir); pos != end; ++pos)
+    {
+        if(!is_directory(*pos) && regex_match(pos->path().filename(),rc[filename]))
+        {
+            v.push_back(pos->path()); //找到，加入vector
+        }
+    }
+}
+```
+
+
+
    
 
 

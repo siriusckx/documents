@@ -107,3 +107,151 @@ max_date_time:可表示最大日期或时间
 ```
 #include <boost/date_time/gregorian/gregorian.hpp>
 ```
+
+#### 1.3.1.1 创建日期对象
+
+>空的构造函数会创建一个值为not_a_date_time的无效日期，顺序传入年月日值则创建一个对应日期的date对象，例如：
+
+```
+date d1;    //一个无效的日期
+date d2(2010, 1, 1);    //使用数字构造日期
+date d3(2010, Jan, 1);  //也可以使用英文指定日期
+date d4(d2);    //date支持拷贝构造
+
+assert(d1 == date(not_a_date_time));    //比较一个临时对象
+assert(d2 == d4);    //date支持比较操作
+```
+
+> date也可以从一个字符串产生，这需要使用工厂函数`from_string()`和`from_undelimited_string()`。前者使用分隔符（斜杠或者连字符符）分隔年月日格式的字符串，后者则是无分隔符的的纯字符串格式。
+
+```
+date d1 = from_string("1999-12-31");
+date d2(from_string("2000/1/1"));
+date d3 = from_undelimited_string("20181118");
+```
+
+> day_clock是一个天级别的时钟，它也是一个工厂类，调用它的静态成员函数local_day()和universal_day()会返回一个当天的日期对象，分别是本地日期和UTC日期。day_clock内部使用了C标准库的localtime()和gmtime()函数，因此local_day()的行为依赖于操作系统的时区设置。
+
+```
+cout << day_clock::local_day() << endl;
+cout << day_clock::universal_day() << endl;
+```
+
+>我们也可以使用特殊时间概念枚举 special_values创建一些特殊的日期，在处理如无限期的某些情形下会很有用：
+
+```
+date d1(neg_infin);         //负无限日期
+date d2(pos_infin);         //正无限日期
+date d3(not_a_date_time);   //无效日期
+date d4(max_date_time);     //最大可能日期 9999-12-31
+date d5(min_date_time);     //最小可能日期 1400-01-01
+```
+
+>如果创建日期对象时使用了非法的值，例如日期超过了1400-01-01到9999-12-31的范围，使用不存在的月分或日期，那么date_time库会抛出异常（而不是转换为一个无效日期），可以使用what()获得具体的错误信息。
+
+#### 1.3.1.2 访问日期
+
+> date类的对外接口很像C语言中的tm结构，也可以获得它保存的年、月、日、星期等成分，但date提供了更多的操作。
+
+>成员函数year()、month()和day()分别返回日期的年、月、日。year_month_day()返回一个date::ymd_type结构，可以一次性地获取年月日数据：
+
+```
+date d(2010, 4, 1);
+date::ymd_type ymd = d.year_month_day();
+cout << ymd.year << endl;
+cout << ymd.month<< endl;
+cout << ymd.day<< endl;
+```
+
+>成员函数day_of_week()返回date的星期数，0表示星期天。day_of_year()返回date是当年的第几天（最多是366）。end_of_month()返回当月的最后一天的date对象。
+
+```
+date d(2010, 4, 1);
+assert(d.day_of_week() == 4);
+assert(d.day_of_year() == 91);
+assert(d.end_of_month() == date(2010, 4, 30));
+```
+
+> date还有五个is_XXX()函数，用于检验日期是否是一个特殊日期，它们是：
+
+```
+is_infinity() : 是否是一个无限日期
+is_neg_infinity():是否是一个负无限日期
+is_pos_infinity():是否是一个正无限日期
+is_not_a_date():是否是一个无效日期
+is_special():是否是任意一个特殊日期
+```
+
+#### 1.3.1.3 日期的输出
+> date对象可以很方便地转换成字符串，它提供了三个自由函数：
+> to_simple_string(date d): 转换为YYYY-mmm-DD格式的字符串，其中的mmm为3字符的英文月份名。
+> to_iso_string(date d):转换为YYYYMMDD格式的数字字符串；
+> to_iso_extended_string(date d):转换为YYYY-MM-DD格式的数字字符串
+> date也支持流输入输出，默认使用YYYY-mmm-DD格式。
+
+```
+date d(2008, 11, 20);
+
+cout << to_simple_string(d) << endl; //2008-Nov-20
+cout << to_iso_string(d) << endl; //20081120
+cout << to_iso_extended_string(d) << endl; //2008-11-20
+cout << d << endl; //2008-Nov-20
+```
+
+#### 1.3.1.4 与tm结构的转换
+
+> date支持与C标准库中的tm结构相互转换，转换的规则和函数如下：
+
+> to_tm(date):date转换到tm。tm的时分秒成员（tm_hour, tm_min, tm_sec）均置为0，夏令时标志tm_isdst轩为-1（表示未知）
+
+> date_from_tm(tm datetm):tm转换到date。只使用年、月、日三个成员（tm_year, tm_mon, tm_mday），其他成员均被忽略。
+
+```
+date d(2010, 2, 1);
+
+tm t = to_tm(d);
+assert(t.tm_hour == 0 && t.tm_min == 0);
+assert(t.tm_year == 2010 && t.tm_mday == 1);
+
+date d2 = date_from_tm(t);
+assert(d == d2);
+```
+
+#### 1.3.1.5 日期长度
+
+> 日期长度是以天为单位的时长，是度量时间长度的一个标量。它与日期不同，值可以是任意的整数，可正可负。基本的日期长度类是date_duration.
+
+> date_duration可以使用构造函数构建一个日期长度，成员函数days()返回时长的天数，如果传入特殊时间枚举值则构造出一个特殊时长对象。is_special()和is_negative()可以判断date_duration对象是否为特殊值、是否是负值。unit()返回时长的最小单位，即date_duratin(1)。
+
+> date_duration支持全序 比较操作（== != < <=）等，也支持完全的加减法和递增递减操作，用起来很像一个整数。此外data_duration还支持除法运算，可以除以一个整数，但不能除以另一个date_duration。
+
+> date_time库为date_duration定义了一个常用的typedef::days，这个新名字更好地说明了date_duration的含义，它是一个天数的计量。
+
+```
+days dd1(10) dd2(-100) dd3(255);
+
+assert(dd1 > dd2 && dd1 < dd3);
+assert(dd1 + dd2 == days(-90));
+assert((dd1+dd3).days() == 265);
+assert(dd3/5==days(51));
+
+```
+
+> date_time还提供了months、years、weeks等另外三个时长类，分别用来表示n个月、n个年和n个星期，它们的含义与days类似，但行为不太相同。
+
+> months和years全面支持加减乘除运算，使用成员函数number_of_months()和number_of_years()可获得表示的月数和年数。weeks是date_duration的子类，除了构造函数以7为单位外，其他的行为与days的相同。
+
+```
+weeks w(3); //3个星期
+assert(w.days() == 21) ;
+
+months m(5);  //5个月
+
+years y(2);   //2年
+
+months m2 = y + m ; //2年零5个月
+
+assert(m2.number_of_months() == 29);
+assert((y * 2).number_of_years() == 4); 
+
+```

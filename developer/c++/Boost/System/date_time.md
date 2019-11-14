@@ -255,3 +255,46 @@ assert(m2.number_of_months() == 29);
 assert((y * 2).number_of_years() == 4); 
 
 ```
+
+#### 1.3.1.6 日期运算
+
+> date支持加减运算，两个date对象的加操作是无意义的，date主要是与时长概念配合运算。
+
+> 日期与特殊日期长度、特殊日期与日期长度进行运算的结果也会是特殊日期。
+
+> 在与months、years这两个时长类进行计算时要注意：如果日期是月末的最后一天，那么加减月或年会得到同样的月末时间，而不是简单的月份或者年份中1，这是合乎生活常识的。但当天数是月末的28、29时，如果加减月份到2月份，那么随后的运算就总是月末操作，天数信息就会丢失。
+
+```
+date d(2010, 3, 30);
+d -= months(1);  //2010-2-28,变为月末端，原30的日期信息丢失
+d -= months(1);  //2010-1-31
+d += months(2);  //2010-3-31
+```
+
+> 使用days不会出现同样的问题，如果担心weeks、months、years这些时长类被无意使用进行而扰乱了代码，可以undef宏BOOST_DATE_TIME_OPTIONAL_GREGORIAN_TYPES,这将使用date_time库不包含定义头文件<boos/date_time/date_duration_types.hpp>
+
+#### 1.3.1.7 日期区间
+
+> date_time库使用date_period类来表示日期区间的概念，它时时间轴上的一个左闭右开区间，端点是两个date对象。区间的左值必须小于右值，否则date_period将表示一个无效的日期区间。
+
+> date_period可以指定区间的两个端点构造，也可以指定左端点再加上时长构造，通常后一种方法比较常用，相当于生活中从某天开始的一个周期。如：
+
+```
+date_period dp1(date(2010, 1, 1), days(20));
+date_period dp2(date(2010,1,1), date(2009, 1, 1)); //无效
+date_period dp3(date(2010,3,1), days(-20)); //无效
+```
+
+> 成员函数begin()和last()返回日期区间的两个端点，而end()返回last()后的第一天，与STL中的end()含义相同，是一个“逾尾的位置”。length()返回日期区间的长度，以天为单位。如果日期区间在构造时使用了左大右小的端点或者日期长度是0，那么is_null()函数将返回true。
+
+```
+date_period dp(date(2010, 1, 1), days(20));
+
+assert(!dp.is_null());
+assert(dp.begin().day() == 1);
+assert(dp.last.day() == 20);
+assert(dp.end().day() == 21);
+assert(dp.length().days() == 20);
+```
+
+

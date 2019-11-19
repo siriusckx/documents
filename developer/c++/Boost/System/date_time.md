@@ -297,4 +297,20 @@ assert(dp.end().day() == 21);
 assert(dp.length().days() == 20);
 ```
 
+#### 1.3.1.8 日期区间运算
+
+> date_period同date、days一样，也支持很多运算。成员函数shift()和expand()可以变动区间：shift()将日期区间平移n天而长度不变，expand()将日期区间向两端延伸n天，相当于区间长度加2n天。
+
+```
+date_period dp(date(2010,1,1), days(20));
+
+dp.shift(days(3));
+assert(dp.begin().day() == 4);
+assert(dp.length().days() == 20);
+
+dp.expend(days(3));
+assert(dp.begin().day() == 1);
+assert(dp.length().days() == 26);
+```
+
 

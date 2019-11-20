@@ -313,4 +313,173 @@ assert(dp.begin().day() == 1);
 assert(dp.length().days() == 26);
 ```
 
+> date_period还可以使用成员函数判断某个日期是否在区间内，或者计算日期区间的交集：
 
+```
+is_before()、is_after():日期区间是否在日期前或后；
+contains():日期区间是否包含另一个区间或者日期；
+intersects():两个日期区间是否存在交集；
+intersection():返回两个区间的交集，如果无交集返回一个无效区间；
+is_adjacent():两个日期区间是否相邻；
+```
+
+```
+date_period dp(date(2010,1,1), days(20)); //1-1 至 1-20
+assert(dp.is_after(date(2009,12,1)));
+assert(dp.is_before(date(2010,2,1)));
+assert(dp.contains(date(2010,1,10)));
+assert(dp.intersects(dp2));
+assert(dp.intersection(dp2) == dp2);
+
+date_period dp3(date(2010, 1, 21), days(5)); //1-21 至 1-26
+assert(!dp3.intersects(dp2));
+assert(dp3.intersection(dp2).is_null());
+assert(dp.is_adjacent(dp3));
+assert(!dp.intersects(dp3));
+
+```
+
+> date_period提供了两种并集操作：
+
+```
+merge(): 返回两个区间的并集，如果区间无交集或者不相信则返回无效区间；
+span():合并两日期区间及两者间的间隔，相当于广义的merge()；
+```
+
+```
+date_period dp1(date(2010,1,1), days(20));
+date_period dp2(date(2010,1,5), days(10))
+date_period dp3(date(2010,2,1), days(5));
+date_period dp4(date(2010,1,15), days(10));
+
+assert(dp1.contains(dp2) && dp1.merge(dp2) == dp1);
+assert(!dp1.intersects(dp3) && dp1.merge(dp3).is_null());
+assert(dp1.intersects(dp2) && dp1.merge(dp4).end() == dp4.end());
+assert(dp1.span(dp3).end() == dp3.end());
+```
+
+#### 1.3.1.9 日期迭代器
+
+> date_time库为日期处理提供了迭代器的概念，可以用简单的递增或者递减操作符连续访问日期，这些迭代器包括date_iterator、week_iterator、month_iterator和year_iterator,它们分别以天、周、月和年为单位增减。为了方便用户使用，日期迭代器还重载了比较操作符，不需要用解引用操作符就可以直接与其他日期对象比较大小。
+
+```
+date d(2006, 11, 26);
+day_iterator d_iter(d);    //增减步长默认为1天
+
+assert(d_iter == d);
+++d_iter;     //递增1天
+assert(d_iter == date(2006, 11, 27));
+
+year_iterator y_iter(*d_iter, 3); //增减步长为3年
+assert(y_iter == d + days(1));
+
+++y_iter;         //递增3年
+assert(y_iter->year() ==  2009);
+```
+
+### 1.3.2 处理时间
+
+> date_time库在格里高利历的基础上提供微秒级别的时间系统，但如果需要，它最高可以达到纳秒级别的精确度。
+
+> 需要包含头文件：
+
+```
+#include <boost/date_time/posix_time/posix_time.hpp>
+```
+
+#### 1.3.2.1 时间长度
+
+> 与日期长度date_duration类似，date_time库使用time_duration度量时间长度。time_duration很像C中tm结构的时分秒部分，可以度量基本的小时、分钟和秒钟，在秒以下精确到微秒。如果在头文件`<boost/date_time/posix_time/posix_time.hpp>`之前定义了宏`BOOST_DATE_TIME_POSIX_TIME_STD_CONFIG`，那么它可以精确到纳秒级。
+
+#### 1.3.2.2 操作时间长度
+
+> time_duration可以在构造函数指定时分秒和微秒来构造，例如创建一个1小时10分钟30秒1毫秒（1000微秒）的时间长度。
+
+```
+time_duration td(1, 10, 30, 1000);
+```
+
+> 为了方便使用， time_duration也有几个子类，可以度量不同的时间分辨率，分别是：hours、minutes、seconds、millisec/milliseconds、microsec/microseconds和nanosec/nanoseconds。
+
+```
+hours h(1);
+minutes m(10);
+seconds s(30);
+millisec ms(1);
+
+time_duration td = h + m + s + ms;
+time_duration td2 = hours(2) + seconds(10);
+```
+
+>使用工厂函数duration_from_string(), time_duration也可以从一个字符串创建，字符串中的时、分、秒和微秒需要用冒号隔开。
+
+```
+time_duration td = duration_from_string("1:10:30:001");
+```
+
+>time_duration里的时分秒可以用hours()、minutes()和seconds()成员函数访问。total_seconds()、total_milliseconds()和total_microseconds()分别返回时间长度的总秒数、总毫秒数和总微秒数。fractional_seconds()以long返回微秒数。
+
+> time_duration支持完整的比较操作和四则运算，因此它处理起来比date对象更加容易。如果想要得到time_duration对象的字符串表示，可以使用自由函数to_simple_string(time_duration) 和 to_iso_string(time_duration),它们分别返回HH::MM::SS.fffffffff和HHMMSS,fffffffff格式的字符串。如：
+
+```
+time_duration td(1, 10, 30, 1000);
+cout << to_simple_string(td) << endl; // 01:10:30.001000
+cout << to_iso_string(td) << endl;   // 011030.001000
+```
+
+> time_duration也可以转换到tm结构，同样使用to_tm()函数，但不能进行反向转换。
+
+#### 1.3.2.3 时间长度的精确度
+
+> date_time库默认时间的精确度是微秒，纳秒相关的类和函数如nanosec和成员函数nanoseconds()、total_nanoseconds()都不可用，秒以下的时间度量都使用微秒。当定义了宏BOOST_DATE_TIME_POSIX_TIME_STD_CONFIG时，time_duration的一些行为将发生变化，它的时间分辨率将精确到纳秒，构造函数中秒以下的时间度量单位也会变成纳秒。
+
+```
+#define BOOST_DATE_TIME_POSIX_TIME_STD_CONFIG //定义纳秒精度宏
+#define BOOST_DATE_TIME_SOURCE
+#include <boost/date_time/posix_time/posix_time.hpp>
+
+time_duration td(1, 10, 30, 1000);  //1000纳秒， 即1微秒
+assert(td.total_milliseconds() == td.total_seconds() * 1000); //计算总毫秒数时微秒将被忽略
+```
+
+> 成员函数fractional_seconds()仍然返回秒的小数部分，但单位是纳秒，这也是它的名称不叫milli_seconds()或者nano_seconds()的原因。
+
+>time_duration提供静态成员函数resolution()和num_fractional_digits()来检测当前的精度：
+>resolution()可以返回一个枚举值time_resolutions,表示时间长度的分辨率；
+>静态成员函数num_fractional_digits()返回秒的小数部分的位数（微秒6位，纳秒9位）
+```
+assert(td.resolution() == date_time::nano);
+assert(td.num_fractional_digits() == 9);
+```
+
+#### 1.3.2.4 时间点
+
+>ptime是date_time库处理时间的核心类，它使用64位（微秒级别）或者96位（纳秒级别）的整数在内部存储时间数据，依赖于date和time_duration，因此接口很小。
+>ptime同date一样，也是一个轻量级的对象，可以被高效地任意拷贝赋值，也支持全序比较和加减运算。
+
+#### 1.3.2.5 创建时间点对象
+
+> 最基本的创建ptime的方式是在构造函数中同时指定date和time_duration对象，令ptime等于一个日期加当天的时间偏移量。如果不指定time_duration,则默认为当天的零点。如：
+
+```
+using namespace boost::gregorian;
+ptime p(date(2010,3,5), hours(1));  //2010年3月5日凌晨1时
+```
+
+>ptime也可以从字符串构造，使用工厂函数time_from_string()和from_iso_string().前者使用分隔符分隔日期时间成分，后者则是连续的数字，日期与时间用字母T隔开。
+
+```
+ptime p1 = time_from_string("2010-3-5 01:00:00");
+ptime p2 = from_iso_string("20100305T010000");
+```
+
+>date_time库为ptime也提供了时钟类，可以从时钟产生当前时间。因为时间具有不同的分辨率，有两个类second_clock和microsec_clock分别提供秒级和微秒级的分辨率，它们的接口是相同的，local_time()获得本地当前时间，universal_time()获得UTC当前时间。
+
+```
+ptime p1 = second_clock::local_time();        //秒精度
+ptime p2 = microsec_clock::universal_time();  //微秒精度
+```
+
+#### 1.3.2.6 操作时间点对象
+
+> 由于ptime相当于date+time_duration，因此对它的操作可以分解为对这两个组成部分的操作。

@@ -482,4 +482,92 @@ ptime p2 = microsec_clock::universal_time();  //微秒精度
 
 #### 1.3.2.6 操作时间点对象
 
-> 由于ptime相当于date+time_duration，因此对它的操作可以分解为对这两个组成部分的操作。
+> 由于ptime相当于date+time_duration，因此对它的操作可以分解为对这两个组成部分的操作。ptime使用date()和time_of_day()两个成员函数获得时间点中的日期和时间长度，然后进行分别处理。
+
+```
+ptime p(date(2010,3,20), hours(12) + minutes(30));
+
+date d =p.date();
+time_duration td = p.time_of_day();
+assert(d.month() == 3 && d.day() == 20);
+```
+
+> ptime提供了三个自由函数转换为字符串，分别是：
+
+```
+to_simple_string(ptime);  //转换为YYYY-mmm-DD HH:MM:SS.fffffffff 格式
+to_iso_string(ptime); //转换为 YYYYMMDDTHHMMSS,fffffffff格式；
+to_iso_extended_string(ptime); //转换为YYYY-MM-DDTHH:MM:SS,fffffffff格式
+```
+
+#### 1.3.2.7 与tm、time_t等结构的转换
+
+> 使用自由函数to_tm()，ptime可以单向转换到tm结构，转换规则是date和time_duration的组合。例如：
+
+```
+ptime p(date(2010,2,14), hours(20));
+tm t = to_tm(p);
+```
+
+> 没有一个叫做time_from_tm()的函数可以把tm结构转换成ptime，这与date对象的date_from_tm()是不同的。如果想要把tm转成ptime,可以使用date_from_tm()得到date对象，然后手工操作tm结构得到time_duration对象，最后创建出ptime。另两个函数from_time_t(time_t)和from_ftime\<ptime\>(FILETIME),它们可以从time_t和FILETIME结构创建出ptime对象。这种转换也是单向的，不存在逆向的转换。
+
+#### 1.3.2.8 时间区间
+
+> 与日期区间date_period对应，date_time库也有时间区间的概念，使用类time_period,使用ptime作为区间的两个端点，同样是左闭右开区间。
+
+> time_period的用法与date_period的基本相同，可以用begin()和last()返回区间的两个端点，length()返回区间的长度shift()和expand()变动营销部，也能计算时间区间的交集和并集，就像是date_period的一个时间分辨率的增强版。因此，time_period的详细操作函数可参考date_period。
+
+```
+ptime p(date(2010,1,1), hours(12)); //2010年元旦中午
+time_period tp1(p, hours(8)); //一个8小时的区间
+time_period tp2(p+hours(8), hours(1)); //1小时的区间
+
+assert(tp1.end() == tp2.begin() && tp1.is_adjacent(tp2));
+assert(!tp1.intersects(tp2)); //两个区间相令但不相交
+
+tp1.shift(hours(1));   //tp1 平移1小时
+assert(tp1.is_after(p)); //tp1在中午之后
+tp2.expand(hours(10));//tp2向两端扩展10个小时
+
+assert(tp2.contains(p) && tp2.contains(tp1)); 
+```
+
+#### 1.3.2.9 时间迭代器
+
+> 不同于日期迭代器，时间迭代器只有一个time_iterator.它在构造时传入一个起始时间点ptime对象和一个步长time_duration,然后就同日期迭代器一样使用前置式operator++、operator--来递增或递减时间，解引用操作符返回一个ptime对象。time_iterator也可以直接与ptime比较，无须再使用解引用操作符。以下代码使用时间迭代器以10分钟为步长打印时间：
+
+```
+ptime p(date(2010,2,27), hours(10));
+for(time_iterator t_iter(p, minutes(10)); t_iter < p + hours(1) ; ++t_iter)
+{
+    cout << *t_iter << endl;
+}
+```
+
+### 1.3.3 date_time库的高级议题
+
+#### 1.3.3.1 格式化时间
+> date_time库默认的日期格式简单、标准且是英文。date_time库提供了专门的格式化对象date_facet、time_facet等来搭配IO流，定制日期时间的表现形式。这些格式化对象就像是printf()函数，使用一个格式化字符串来定制日期或时间的格式，也同样有大量的格式标志符。示范格式化的使用、把日期格式化为中文显示的代码如下：
+
+```
+date d(2010, 3, 6);
+date_facet* dfacet = new date_facet("%Y年%m月%d日");
+cout.imbue(locale(cout.getloc(), dfacet));
+cout << d << endl;
+
+time_facet *tfacet = new time_facet("%年%m月%d日%H点%M分%S%F秒");
+cout.imbue(locale(cout.getloc(), tfacet));
+cout << ptime(d, hours(21) + minutes(50) + millisec(100)) << endl;
+
+//输出结果如下
+2010年03月06日
+2010年03月06日21点50分00.001秒
+```
+
+#### 1.3.3.2 本地时间
+
+> 之前对date_time库的讨论都基于简单的时间，通常对于日常工作和生活是足够的，但如果考虑到世界各地不同时区的因素，时间就变得复杂了，两个不同时区对同一个时间点的日期和时间表示可能会不同，如果再加上某些地区的夏令时因素就更加复杂了。
+
+> date_time库使用time_zone_base、posix_time_zone、custom_time_zone、local_date_time等类和一个文本格式的时区数据库来解决本地时间中时区和夏令时的问题。
+
+> 本地时间功能位于名字空间boost::local_time，为了使用本地时间功能，需要包含头文件\<boost/date_time/local_time/local_time.hpp\>

@@ -571,3 +571,11 @@ cout << ptime(d, hours(21) + minutes(50) + millisec(100)) << endl;
 > date_time库使用time_zone_base、posix_time_zone、custom_time_zone、local_date_time等类和一个文本格式的时区数据库来解决本地时间中时区和夏令时的问题。
 
 > 本地时间功能位于名字空间boost::local_time，为了使用本地时间功能，需要包含头文件\<boost/date_time/local_time/local_time.hpp\>
+
+> time_zone_base是时区表示的抽象类，通常我们使用一个typedef:time_zone_ptr,它是一个指向time_zone_base的智能指针。
+
+> local_date_time是一个含有时区信息的时间对象，它可以由date+time_duration+时区构造，构造时必须指定这个时间是否是夏令时，本地时间在内部以UTC的形式保存以方便计算。
+
+#### 1.3.3.3 序列化
+
+> date_time库可以使用boost::serialization库的能力实现数据序列化，把日期时间数据存入某个文件，之后在任意的时刻读取恢复，如同流操作一样简单方便。

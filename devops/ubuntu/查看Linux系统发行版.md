@@ -4,3 +4,4 @@
 1. lsb_release -a
 1. cat /proc/version
 2. cat /etc/os-release 
+6. cat /etc/redhat-release 

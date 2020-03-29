@@ -47,3 +47,5 @@ https://blog.csdn.net/xwbk12/article/details/78884729
    ```
    mkdir -pv ./{role1,role2}/{files,templates,vars,tasks,handlers,meta,default}
    ```
+6. 使用 facts 的变量
+   >我们可以称之为二级变量或者子键，分别对应着不同的值，这些子键的调用需要上级主键的配合使用才能完成变量调用，其格式为{{ main_var[ "sub_var" ] }}。 

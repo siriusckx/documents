@@ -1,3 +1,4 @@
+
 # yum之慎用 update upgrade
 > centos 7 yum update 和 upgrade 均会升级操作系统的发行版，yum update还会进一步升级操作系统的内核。如下所示：
 
@@ -34,4 +35,3 @@ CentOS Linux release 7.7.1908 (Core)
 [root@localhost log]# uname -r
 3.10.0-1062.18.1.el7.x86_64
 [root@localhost log]# 
-```

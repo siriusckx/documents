@@ -15,6 +15,8 @@
 
 [GitLab之gitlab-ci.yml配置文件详解](https://www.cnblogs.com/szk5043/articles/9854712.html)
 
+[GitLab CI/CD Pipeline Configuration Reference](https://docs.gitlab.com/ee/ci/yaml/README.html)
+
 [Gitlab+Gitlab-CI+Docker实现持续集成(CI)与持续部署(CD)](https://www.cnblogs.com/liuge36/p/9882629.html)
 
 [gitlab搭建与基本使用](https://blog.csdn.net/qq_34129814/article/details/100043914)

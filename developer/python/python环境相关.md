@@ -23,6 +23,11 @@ python -c "from distutils.sysconfig import get_python_lib; print (get_python_lib
    ```
 4. 命令行查看pip则安装成功
 
+> 或者直接安装
+```
+yum install python-pip
+```
+
 ## pip install xx 报错
 ```
  InsecurePlatformWarning

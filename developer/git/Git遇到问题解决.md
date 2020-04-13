@@ -84,3 +84,9 @@ git push origin test:master         // 提交本地test分支作为远程的mast
 git push origin test:test           // 提交本地test分支作为远程的test分支
 git push origin :test               // 刚提交到远程的test将被删除，但是本地还会保存的
 ```
+
+## 十一、执行Git命令时出现各种 SSL certificate problem 的解决办法
+> 用git自带的配置命令
+```
+git config --global http.sslVerify false
+```

@@ -7,5 +7,5 @@ https://upload.wikimedia.org/wikipedia/commons/1/1b/Linux_Distribution_Timeline.
 https://www.jianshu.com/p/ce985d0c2d50
 > 关于常见开源软件名字的由来
 
->Unix & Unix-like (as UN*X or *nix) 发展时间线
+>Unix & Unix-like (as UN*X or *nix) 发展时间线*
 ![Unix & Unix-like (as UN*X or *nix) 发展时间线](./img/Unix_history-simple.svg)

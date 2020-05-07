@@ -7,9 +7,17 @@ systemctl enable postfix
 systemctl start postfix
 ```
 ## 1.2 添加 gitlab 包仓库地址并安装包
+>这种方式安装的是，最新版的gitlab-ee，如果需要安装指定版本的gitlab-ee则不太适合
 ```
 curl https://packages.gitlab.com/install/repositories/gitlab/gitlab-ee/script.rpm.sh | sudo bash
 yum install -y gitlab-ee
+```
+> 如果要安装指定的版本，可以直接下载rpm包进行安装，如：  
+https://mirrors.tuna.tsinghua.edu.cn/gitlab-ee/yum/el7/  
+https://mirrors.tuna.tsinghua.edu.cn/gitlab-ce/yum/el7/
+```
+下载好具体的安装包后，然后通过 rpm 进行安装
+rpm -ivh gitlab-ee-12.9.1-ee.0.el7.x86_64.rpm
 ```
 
 ## 1.3 启用 https 
@@ -144,3 +152,59 @@ gitlab-runner fatal: could not read Username
 # 3 gitlab 配置优化
 # 4 CI/CD 的使用
 > 结合 gitlab-runner、ansible 以及 ansible 代理，实现项目的自动化集成和自动化部署。
+
+## 4.1 Git下外链的管理
+> 获取tag最新分支
+```
+git describe --tags `git rev-list --tags --max-count=1
+```
+
+> 获取当前 branch 或者 tag 的名称
+```
+git symbolic-ref --short -q HEAD  || git describe --tags --exact-match HEAD
+```
+
+# 5 gitlab 的备份与恢复
+[Gitlab备份、迁移、恢复和升级 ](https://www.cnblogs.com/ssgeek/p/9392104.html)  
+[CentOS 7下安装指定版本的GitLab，和数据备份与恢复](https://blog.csdn.net/djzhao627/article/details/88356067)
+[完全卸载删除gitlab](https://yq.aliyun.com/articles/114619)
+
+> 查看 gitlab 的版本号
+```
+cat /opt/gitlab/embedded/service/gitlab-rails/VERSION
+```
+
+## 5.1 备份 gitlab
+### 5.1.1 修改配置文件的目录
+>可以通过/etc/gitlab/gitlab.rb配置文件来修改默认存放备份文件的目录 
+```
+gitlab_rails['backup_path'] = "/var/opt/gitlab/backups"
+```
+修改完成之后使用`gitlab-ctl reconfigure`命令重载配置文件即可 
+### 5.1.2 设置备份过期时间
+```
+[root@gitlab ~]# vim /etc/gitlab/gitlab.rb
+gitlab_rails['backup_keep_time'] = 604800        #以秒为单位
+```
+### 5.1.3 相关数据和文件进行备份
+1. 备份时需要保持gitlab处于正常运行状态，直接执行`gitlab-rake gitlab:backup:create`进行备份
+2. `/etc/gitlab/gitlab.rb` 配置文件须备份 
+3. `/var/opt/gitlab/nginx/conf` nginx配置文件 
+4. `/etc/postfix/main.cfpostfix` 邮件配置备份 
+
+### 5.1.4 编写脚本，设置定时任务自动备份
+```
+```
+
+## 5.2 恢复 gitlab
+## 5.2.1 本机恢复
+## 5.2.2 新服务器恢复
+## 5.2.3 恢复过程中遇到的问题
+>在卸载gitlab然后再次安装执行`sudo gitlab-ctl reconfigure`的时候往往会出现：`ruby_block[supervise_redis_sleep] action run`，会一直卡无法往下进行。解决方案：
+```
+1、按住CTRL+C强制结束；
+
+2、运行：sudo systemctl restart gitlab-runsvdir；
+
+3、再次执行：sudo gitlab-ctl reconfigure
+```

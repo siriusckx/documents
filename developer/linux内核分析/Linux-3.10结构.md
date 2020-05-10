@@ -70,3 +70,4 @@
 └── xtensa-------美国 Tensilica （泰思立达）公司开发的可配置及可扩展的微处理器。
 ```
 [Linux内核arch目录，各个处理器的介绍](https://blog.csdn.net/u014379540/article/details/52263342)
+

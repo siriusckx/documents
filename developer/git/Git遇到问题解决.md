@@ -90,3 +90,7 @@ git push origin :test               // 刚提交到远程的test将被删除，�
 ```
 git config --global http.sslVerify false
 ```
+
+## 十二、 分支合并是否使用squash
+
+普通分支合并到 dev 分支时，可以使用 squash，这样可以将多个提交合并在一个提交里面。当 dev 分支合并到 master 时，不要选择 squash ，这样不利于溯源。

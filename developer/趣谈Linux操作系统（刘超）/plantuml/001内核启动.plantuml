@@ -1,0 +1,10 @@
+@startmindmap
+* 内核启动\nstart_kernel
+** 项目管理初始化\nINIT_TASK(init_task)
+** 办事大厅初始化\ntrap_init()
+** 会议管理系统初始化\nmm_init()
+** 项目管理流程初始化\nsched_init()
+** 其他初始化\nrest_init()
+*** 一号进程：用户总管\nkernel_thread(kernel_init,NULL,CLONE_FS)
+*** 二号进程：内核态总管\nkernel_thread(kthreadd,NULL,CLONE_FS)|CLONE_FILES)
+@endmindmap

@@ -150,6 +150,48 @@ gitlab-runner fatal: could not read Username
 [解决gitlab需要输入用户名密码的问题](https://www.jianshu.com/p/7f94238d24d4)
 
 # 3 gitlab 配置优化
+
+### 3.1 网友经验修改配置优化
+
+* 解决内网环境部署gitlab访问慢的问题——禁用gravatar头像
+
+  > 如果该请求勾选了 `enable` ,网络会向 www.gravatar.com 发起请求，它是一个用来保存头像的 cdn，由于自己搭建的环境，不需要使用这个。该请求如果访问互联网较慢时，会阻塞其他的请求，导致访问缓慢。修改后，页面访问的速度确实变快了一些。
+
+  ```mermaid
+  graph LR
+      Admin --> Settings --> General --> Account["Account and limit"] -- disable --> final["Gravatar enabled"]
+      
+  
+  ```
+
+* 调整 unicorn 工作进程数，不能低于 2
+
+  ```
+  unicorn['worker_processes'] = 8
+  ```
+
+### 3.2 查看官方文档进一步优化
+
+添加性能条 [performance_bar](https://docs.gitlab.com/ee/administration/monitoring/performance/performance_bar.html)
+
+> **NOTE:** 按照文档添加后，还需要使用 `p` + `b` 快捷键才能够在页面看到性能条。
+
+* 没有使用 SSH 的方式推送代码，可以去掉 `Write to "authorized_keys" file` 这个选项
+
+  ```mermaid
+  graph LR
+  Admin --> Settings --> Network --> P["Performance optimization"] -- disable --> Final["write to authorized_keys file"]
+  ```
+
+### 3.3 开启 WEB-IDE 提升 review 效率
+
+开户 `web-ide` 可以使得代码 `review` 更为方便， 开启方式如下：
+
+```mermaid
+graph LR
+    Admin --> Settings --> General -- enable --> W["Web IDE"]
+```
+
 # 4 CI/CD 的使用
 > 结合 gitlab-runner、ansible 以及 ansible 代理，实现项目的自动化集成和自动化部署。
 
@@ -169,7 +211,7 @@ git symbolic-ref --short -q HEAD  || git describe --tags --exact-match HEAD
 [CentOS 7下安装指定版本的GitLab，和数据备份与恢复](https://blog.csdn.net/djzhao627/article/details/88356067)
 [完全卸载删除gitlab](https://yq.aliyun.com/articles/114619)
 
-> 查看 gitlab 的版本号
+> **NOTE**：程序的备份与恢复，需要在 GitLab 版本一致的情况下才可以进行，查看 gitlab 的版本号
 ```
 cat /opt/gitlab/embedded/service/gitlab-rails/VERSION
 ```
@@ -194,6 +236,7 @@ gitlab_rails['backup_keep_time'] = 604800        #以秒为单位
 
 ### 5.1.4 编写脚本，设置定时任务自动备份
 ```
+
 ```
 
 ## 5.2 恢复 gitlab

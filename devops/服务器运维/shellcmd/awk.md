@@ -702,3 +702,12 @@ awk -F "#" '$1~/^B/{print $0}$NF~/1$/{print $0}' awk.txt
 ```
 for line in $(<gte110times.txt); do grep $line login.log; done
 ```
+
+## 9.5 将某个程序的依赖库拷贝到当前目录
+
+```shell
+for i in `ldd proxy |awk -F '=>' '{print $2}'|awk -F ' ' '{print $1}'`;do cp $i .; done
+```
+
+
+

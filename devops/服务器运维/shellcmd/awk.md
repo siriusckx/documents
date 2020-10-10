@@ -709,5 +709,13 @@ for line in $(<gte110times.txt); do grep $line login.log; done
 for i in `ldd proxy |awk -F '=>' '{print $2}'|awk -F ' ' '{print $1}'`;do cp $i .; done
 ```
 
+## 9.6 循环打印每一列
+
+```sh
+awk -F ";" '{ for(i=1;i<=100;i++) print $i}' filename
+```
+
+
+
 
 

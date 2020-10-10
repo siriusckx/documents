@@ -109,7 +109,8 @@ yum install -y gitlab-ci-multi-runner
 ```
 
 ## 2.2 gitlab-runner 配置
-1. **更改执行用户为root**
+#### 2.2.1 更改执行用户为root
+
 > gitlab-ci 的runner 默认使用 gitlab-runner 用户执行操作；
 ```
 gitlab-runner uninstall
@@ -120,7 +121,8 @@ systemctl restart gitlab-runner
 ```
 > 再次执行ps aux|grep gitlab-runner会发现--user的用户名已经更换成root了
 
-2. **注册 runner**
+#### 2.2.2 注册 runner
+
 ```
 gitlab-runner register --tls-ca-file=/etc/gitlab/ssl/server.crt 
 ```
@@ -128,7 +130,7 @@ gitlab-runner register --tls-ca-file=/etc/gitlab/ssl/server.crt
 
 > 接下来按照提示将```GitLab->project->settings->CI/CD->runners```下的信息一一对应填上。
 
-3. **gitlab 客户端需要配置一个永久的用户名和密码**
+#### 2.2.3 gitlab 客户端需要配置一个永久的用户名和密码
 
 > 在做CI/CD的过程中，需要从服务器拉取代码，客户端可能因为没有缓存token或者token过期后，认证不通过，会一直卡住，直到超时。期间如果重置了`gitlab unset credential.helper `还会出现如下错误。
 ```

@@ -44,3 +44,16 @@ find /usr/include |xargs grep -ri "SO_REUSEADDR"
 ```
 find .|xargs grep -ri "IBM" -l 
 ```
+
+
+
+### find 排出目录
+
+>-path 'ignore-path' -prune -o -type d -print  
+>
+>要注意 -path 要紧跟 查找的目录， -prune -o  -print   不能少
+
+```
+find . -maxdepth 1 -path './.stfolder' -prune -o -type d -print
+```
+

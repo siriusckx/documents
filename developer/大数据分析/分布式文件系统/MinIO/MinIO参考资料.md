@@ -35,6 +35,8 @@
    * 磁盘性能
 
    * 参数调优
-
-     
+1. [k8s相关文档](https://www.kubernetes.org.cn/k8s)
+1. [kupernetes 中文文档](https://kubernetes.io/zh/docs/home/)
+1. [Minio中国镜像](http://dl.minio.org.cn/server/minio/release/linux-amd64/)
+1. [什么是对象存储？看这一篇就够了](https://www.sohu.com/a/391960620_505795)
 

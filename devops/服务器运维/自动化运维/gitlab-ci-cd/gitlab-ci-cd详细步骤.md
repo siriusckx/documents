@@ -36,6 +36,26 @@ rpm -ivh gitlab-ee-12.9.1-ee.0.el7.x86_64.rpm
 
 2. 生成秘钥与证书
 ```
+编辑 /etc/hosts 配置相应的域名映射（gitlab-ctl服务器和gitlab-runner服务器两个都要做映射）
+10.10.1.226 gitlab.com
+
+备注：网上有的地方是找到对应的v3_ca修改，但不生效，可能是openssl版本的问题。
+# 找到OpenSSL工具配置文件openssl.cnf，对于Centos,目录在/etc/pki/tls/中
+编辑openssl.cnf,在[v3_ca]下面添加：subjectAltName = IP:域名|IP地址，保持IP地址和生成证书时配置的地址一致
+[ v3_ca ]
+subjectAltName = IP:139.199.125.93
+```
+
+```
+编辑extfile.cnf文件
+
+subjectAltName = IP:10.10.1.226
+subjectKeyIdentifier=hash
+authorityKeyIdentifier=keyid,issuer
+basicConstraints=CA:TRUE
+```
+
+```
  #秘钥脚本，将以下内容保存为shell脚本，然后运行
  #出现提示输入信息的地方输入信息，先输入域名然后4次证书密码，任意密码，四次保持一致。
 
@@ -62,7 +82,7 @@ rpm -ivh gitlab-ee-12.9.1-ee.0.el7.x86_64.rpm
  
  echo "Sign SSL certificate..."
  
- openssl x509 -req -days 3650 -in $DOMAIN.csr -signkey $DOMAIN.key -out $DOMAIN.crt
+ openssl x509 -req -days 3650 -in $DOMAIN.csr -signkey $DOMAIN.key -out $DOMAIN.crt -extfile extfile.cnf
  
  echo "TODO:"
  echo "Copy $DOMAIN.crt to /etc/nginx/ssl/$DOMAIN.crt"
@@ -90,6 +110,9 @@ rpm -ivh gitlab-ee-12.9.1-ee.0.el7.x86_64.rpm
  sudo chmod 700 /etc/gitlab/ssl/ -R
  sudo cp 139.199.125.93.crt /etc/gitlab/ssl/server.crt
  sudo cp 139.199.125.93.key /etc/gitlab/ssl/server.key
+ 
+ #辅助查看,证书中是否带有相应的IP地址
+ openssl x509 -in ./server.crt -noout -text
 ```
 
 3. 重建gitlab配置
@@ -127,6 +150,10 @@ systemctl restart gitlab-runner
 gitlab-runner register --tls-ca-file=/etc/gitlab/ssl/server.crt 
 ```
 > --tls-ca-file 指向的server.crt 来源于 `gitlab` 服务器端生成的证书。
+
+> 填 Please enter the gitlab-ci coordinator URL 这个时，填：https://gitlab.com:64271/ 避免出现如下错误：
+>
+> x509: cannot validate certificate for 10.10.1.226 because it doesn't contain any IP SANs
 
 > 接下来按照提示将```GitLab->project->settings->CI/CD->runners```下的信息一一对应填上。
 

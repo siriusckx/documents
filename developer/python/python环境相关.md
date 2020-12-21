@@ -91,3 +91,22 @@ SyntaxError: Non-ASCII character '\xef' in file server.py on line 18, but no enc
   pip uninstall bson
   pip install pymongo
   ```
+
+
+
+## 2.5 更新pip和setuptools
+
+```
+pip install --upgrade pip
+pip install --upgrade setuptools
+```
+
+
+
+### 2.5 python 文件处理时乱码问题
+
+python 乱码解决
+
+https://www.cnblogs.com/CasonChan/p/4669799.html
+
+https://cloud.tencent.com/developer/article/1137667

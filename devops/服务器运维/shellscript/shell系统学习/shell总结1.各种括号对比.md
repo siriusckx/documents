@@ -6,6 +6,7 @@
 | var=$(command)                                               | 将命令输出赋值给变量，与反引号字符 ``功能一样                | 执行命令会开启子 shell                                       |
 | if [ command or simple expression ]                          | 默认情况下 `if command` 命令执行成功（状态码为0），才会进入if里面的代码块。使用[]将其转换成与高级语言类似的 True 和 False。与 `if test command` 功能一样。 | 方括号` [ ] `两边要有 空格 。这里面涉及一些特殊字符时，如 `> < `等，要注意转义，避免被当作重定向命令。 |
 | if [ command or simple expression ] && [ command or simple expression ] | 条件判断的复合表达式                                         |                                                              |
-| (( expression ))                                             | 高级数学表达式，expression 可以是任意的数学赋值或比较表达式。 |                                                              |
-| [[ expression ]]                                             | 相对于 test 简单字符串比较：支持**模式匹配**，表达式中的>和<符号不需要转义。 | =  表示字符串相等。== 表示模式匹配。                         |
+| (( expression ))                                             | 高级数学表达式，expression 可以是任意的数学赋值或比较表达式。其中的表达式，和c语言风格的表达式一样。 |                                                              |
+| if [[ expression ]]                                          | 相对于 test 简单字符串比较：支持**模式匹配**，表达式中的>和<符号不需要转义。 | =  表示字符串相等。== 表示模式匹配。                         |
+| ${}                                                          | 当传入参数超过10个时，要获得更多的参数，下标用{}括起来。     |                                                              |
 

@@ -110,3 +110,16 @@ python 乱码解决
 https://www.cnblogs.com/CasonChan/p/4669799.html
 
 https://cloud.tencent.com/developer/article/1137667
+
+## 2.6 CentOS 安装 python3 与 python2 共存
+
+https://www.cnblogs.com/holdononedream/p/10847772.html
+
+https://blog.51cto.com/liqingbiao/2083869
+
+## 附录：
+
+[python下载ftp](https://www.python.org/ftp/python/)
+
+
+

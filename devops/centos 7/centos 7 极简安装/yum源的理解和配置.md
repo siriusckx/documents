@@ -61,3 +61,24 @@ yum clean all
 
 yum makecache
 ```
+
+## 四、注意事项
+
+### 4.1 找不到GPKG文件时
+
+```
+GPG key retrieval failed: [Errno 14] curl#37 - "Couldn't open file /etc/pki/rpm-gpg/RPM-GPG-KEY-EPEL-7"
+```
+
+```
+cd /etc/pki/rpm-gpg/
+wget https://archive.fedoraproject.org/pub/epel/RPM-GPG-KEY-EPEL-7
+```
+
+### 4.2  yum makecache 不了时
+
+```
+vim /etc/resolve.conf
+nameserver 114.114.114.114
+```
+

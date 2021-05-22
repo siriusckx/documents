@@ -38,11 +38,11 @@
 > trusted.glusterfs.mdata=0x010000000000000000000000005fabc05d00000000305fe76f000000005fabc05d00000000305fe76f000000005f7b9c02000000000a4f9e36
 > trusted.glusterfs.volume-id=0x6933a6cbfb0b42719b6ff6bd6fc388cc
 > 
-> 设置故障节点新目录的扩展属性，触发自愈【该属性是设置了，但一直没观察到新替换节点的自愈】
-> mkdir /data/gfsdata/test1
-> rm -rf /data/gfsdata/test1
-> setfattr -n trusted.non-existent-key -v abc /data/gfsdata
-> setfattr -x trusted.non-existent-key  /data/gfsdata
+> 设置故障节点新目录的扩展属性，触发自愈【该目录填写的是要挂载的目录，不是gluster存储数据的那个物理目录】
+> mkdir /glusterfs/metadatas/test1
+> rm -rf /glusterfs/metadatas/test1
+> setfattr -n trusted.non-existent-key -v abc /glusterfs/metadatas
+> setfattr -x trusted.non-existent-key  /glusterfs/metadatas
 > 
 > 再次查询故障节点的备份节点的扩展属性，看新节点是否进行了同步
 > [root@localhost ~]# getfattr -d -m. -e hex /home/gfsdata 

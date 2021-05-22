@@ -29,7 +29,7 @@ CENTOS_MANTISBT_PROJECT_VERSION="7"
 REDHAT_SUPPORT_PRODUCT="centos"
 REDHAT_SUPPORT_PRODUCT_VERSION="7"
 ```
-## 1.1 单次内存分配
+## 1.1 malloc 单次内存分配
 
 ### 1.1.1 测试方法
 
@@ -116,7 +116,7 @@ C3-->E
 
 **NOTE**:对于常驻内存和共享内存是怎么变换的，这个换页机制，还有待研究。
 
-## 1.2 多次内存分配
+## 1.2 malloc 多次内存分配
 
 ### 1.2.1 测试方法
 
@@ -201,11 +201,13 @@ int main ()
 
 程序启动一次，分多批申请，一批申请分配 100W 次内存，相对前一种只申请一批的情况，申请同样大小的内存，分多批次分配的内存较大，可以看出内存碎片程度较大一些，由申请的小内存最初的 3 倍左右，到逐渐与申请的内存大小相匹配，随着申请内存的总量接近 750M 时，差距在30MiB ~ 60MiB 左右。而在真实的生产中，程序会一次启动，可能会跑很久，碎片程度要比这个严重得多。
 
-## 1.3 C++ 智能指针存入 vector 内存分配
+## 1.3 new 裸指针多次内存分配
 
 ### 1.3.1 测试代码
 
-```c++
+```
+#include <stdio.h>      /* printf, scanf, NULL */
+#include <stdlib.h>     /* malloc, free, rand */
 #include <unistd.h>
 #include <iostream>
 #include <memory>
@@ -219,21 +221,24 @@ struct Demo
 };
 typedef std::shared_ptr<Demo> DemoPtr;
 
-int main()
-{
+int TIMES = 1000000;
 
+int main ()
+{
    std::cout<<"demo size:"<<sizeof(Demo)<<endl;
-   std::cout<<"demoptr size:"<<sizeof(DemoPtr)<<endl;
-   std::vector<DemoPtr> lst;
+   std::cout<<"demo* size:"<<sizeof(Demo*)<<endl;
+   std::vector<Demo*> lst;
+   lst.resize(TIMES);
    sleep(30);
-   std::cout<<"read create obj"<<endl;
+   std::cout<<"ready create obj"<<endl;
    long size = 0;
-   for(int i=0;i <1000000; i++)
-   {
-       DemoPtr d=std::make_shared<Demo>(1);
-       lst.push_back(d);
+   for(int i=0;i <TIMES; i++)
+   {   
+       Demo* d=new Demo(1);
+       lst[i]=d;
        size+=sizeof(Demo);
-   }
+       size+=sizeof(Demo*);
+   }   
    std::cout<<"total size:" << size << std::endl;
    sleep(30);
 
@@ -252,40 +257,135 @@ g++ -lboost_system -std=c++11 test_vector_ptr_min.cpp
 g++ -ljemalloc -lboost_system -std=c++11 test_vec_ptr_str_boost_gt4.cpp -o jemalloc.gt4.out
 ```
 
-### 1.3.2 测试用例
 
-| Demo 原始对象大小                               | DemoPtr 指针大小 | vector存100W个DemoPtr  | 程序物理内存大小 |
-| ----------------------------------------------- | ---------------- | ---------------------- | ---------------- |
-| 8                                               | 16               | 8,000,000+16,000,000   | 64,304 * 1024    |
-| 16                                              | 16               | 16,000,000+16,000,000  | 63,432 * 1024    |
-| 32                                              | 16               | 32,000,000+16,000,000  | 79,376 * 1024    |
-| 48                                              | 16               | 48,000,000+16,000,000  | 94,928 * 1024    |
-| 64                                              | 16               | 64,000,000+16,000,000  | 110,328 * 1024   |
-| 128                                             | 16               | 128,000,000+16,000,000 | 173,020 * 1024   |
-| 136(其中一个字符串是一个字段) std::shared_ptr   | 16               | 136,000,000+16,000,000 | 188,624 * 1024   |
-| 136(其中一个字符串是一个字段) boost::shared_ptr | 16               | 136,000,000+16,000,000 | 188,776 * 1024   |
-| 136(其中一个字符串是一个字段) jemalloc          | 16               | 136,000,000+16,000,000 | 212,396 * 1024   |
 
-### 1.3.3 测试结论
+### 1.3.2 测试数据
 
-**根据以上测试数据分析：**
+| 是否使用 jemalloc | 程序未创建对象大小(KiB) | vector存100W个Demo*大小(B) | 程序物理内存大小（KiB） | 冗余内存比例（多次数据相似）                          |
+| ----------------- | ----------------------- | -------------------------- | ----------------------- | ----------------------------------------------------- |
+| 否                | 8988                    | 16,000,000                 | 40140                   | ((40140-8988)*1024-16,000,000)/16,000,000\*100%=99.4% |
+| 是                | 9004                    | 16,000,000                 | 17188                   | 基本没什么浪费，vector在存数据时还不计算指针大小      |
 
-在使用`C++11 std::shared_ptr` 和  `boost::shared_ptr` 做内存分配的情况下，其内存分配机制大致如下。但是合适了 `jemalloc` 后在这种单一的内存分配场景下，相对来说占用较多的一些内存。在实际生产中，使用 `jemalloc` 会对整体的内存分配有一个全局的提升。
+## 1.4 std::sharted_ptr智能指针内存分配
 
-```mermaid
-graph TD
-A[vector存放智能指针]
-C{原始对象大小+智能指针大小<=32B}
-D1[大概物理内存 = 64B * 条数]
-D2[大概物理内存 = 原始对象+智能指针+32B * 条数]
-A-->C
-C--YES-->D1
-C--NO-->D2
+### 1.4.1 测试代码
 
+```c++
+#include <stdio.h>      /* printf, scanf, NULL */
+#include <stdlib.h>     /* malloc, free, rand */
+#include <unistd.h>
+#include <iostream>
+#include <memory>
+#include <vector>
+using namespace std;
+
+struct Demo
+{
+    long a;
+    Demo(int ta):a(ta){}
+};
+typedef std::shared_ptr<Demo> DemoPtr;
+
+int TIMES = 1000000;
+
+int main ()
+{
+   std::cout<<"demo size:"<<sizeof(Demo)<<endl;
+   std::cout<<"demoptr size:"<<sizeof(DemoPtr)<<endl;
+   std::vector<DemoPtr> lst;
+   lst.resize(TIMES);
+   sleep(30);
+   std::cout<<"ready create obj"<<endl;
+   long size = 0;
+   for(int i=0;i <TIMES; i++)
+   {   
+       DemoPtr d=std::shared_ptr<Demo>(new Demo(1));
+       lst[i]=d;
+       size+=sizeof(Demo);
+       size+=sizeof(DemoPtr);
+   }   
+   std::cout<<"total size:" << size << std::endl;
+   sleep(30);
+
+   return 0;
+}
 ```
 
-## 1.4 C++中智能指针使用
+### 1.4.2 测试数据
 
-**根据以上的一些测试和使用总结**：
+| 是否使用 jemalloc | 程序未创建对象大小(KiB) | vector存100W个DemoPtr大小(B) | 程序物理内存大小（KiB） | 冗余内存比例（多次数据相似）                           |
+| ----------------- | ----------------------- | ---------------------------- | ----------------------- | ------------------------------------------------------ |
+| 否                | 16640                   | 24,000,000                   | 79208                   | ((79208-16640)*1024-24,000,000)/24,000,000\*100%=167%  |
+| 是                | 16928                   | 24,000,000                   | 57056                   | ((57056-16928)*1024-24,000,000)/24,000,000\*100%=71.2% |
 
-在使用智能指针包装数据，在将包装后的智能指针放入 `vector` 时，如果数据比较小，在数据条数比较多的时候会造成大量的内存浪费，基本在 `30% ~ 50%` 左右。使用结果体，则不会造成空间的浪费，要注意的是对结构体的拷贝操作。
+## 1.5 结构体内存分配
+
+### 1.5.1 测试代码
+
+```c++
+#include <stdio.h>      /* printf, scanf, NULL */
+#include <stdlib.h>     /* malloc, free, rand */
+#include <unistd.h>
+#include <iostream>
+#include <memory>
+#include <vector>
+using namespace std;
+
+struct Demo
+{
+    long a;
+    Demo(int ta):a(ta){}
+};
+typedef std::shared_ptr<Demo> DemoPtr;
+
+int TIMES = 1000000;
+
+int main ()
+{
+   std::cout<<"demo size:"<<sizeof(Demo)<<endl;
+   std::vector<Demo> lst;
+   lst.resize(TIMES);
+   sleep(30);
+   std::cout<<"ready create obj"<<endl;
+   long size = 0;
+   for(int i=0;i <TIMES; i++)
+   {   
+       Demo d(1);
+       lst[i]=d;
+       size+=sizeof(Demo);
+   }   
+   std::cout<<"total size:" << size << std::endl;
+   sleep(30);
+
+   return 0;
+}
+```
+### 1.5.2 测试数据
+
+| 是否使用 jemalloc | 程序未创建对象大小(KiB) | vector存100W个Demo*大小(B) | 程序物理内存大小（KiB） | 冗余内存比例（多次数据相似） |
+| ----------------- | ----------------------- | -------------------------- | ----------------------- | ---------------------------- |
+| 否                | 8984                    | 8,000,000                  | -                       | top 常驻物理内存，预先分配   |
+| 是                | 8984                    | 8,000,000                  | -                       | top 常驻物理内存，预先分配   |
+
+## 总结
+
+1. 在使用智能指针包装数据，在将包装后的智能指针放入 `vector` 时，如果数据比较小，在数据条数比较多的时候会造成大量的内存浪费，基本在 `30% ~ 50%` 左右。使用结构体，则不会造成空间的浪费，要注意的是对结构体的拷贝操作。
+
+## 进一步研究
+
+1. C++ Vector 内存分配机制
+
+2. 智能指针内存分配回收机制
+
+3. new 和 delete 内存分配回收机制
+
+4. 智能指针和裸指针放入 vector 为何在某些场景下裸指针占内存反而更大，此时的内存布局是什么样的
+
+5. 字符串片段在内存中是如何分配的
+
+6. 智能指针、裸指针、结构体之间的转换
+
+7. 栈内存和堆内存分配机制，对于 vector 来说是否一致
+
+   
+
